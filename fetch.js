@@ -30,7 +30,7 @@ const fetchList = async (listId) => {
   let results = []
   let resultSize = 0
   const getListPage = getPage(listId)
-  
+
   do {
     console.log(`Fetching page ${pageNumber} of ${listId}`)
     const response = await getListPage(pageNumber)
@@ -51,10 +51,16 @@ const fetchIssues = async () => {
 
   for (let issue of issues) {
     if (issue.pull_request) {
+
       const pr = pulls.find(pull => pull.number === issue.number)
-      const prReviews = await fetchList(`pulls/${issue.number}/reviews`)
+      let prReviews = [];
+      try {
+        prReviews = await fetchList(`pulls/${issue.number}/comments`)
+      } catch (e) {
+          console.log(e.message);
+      }
       for (let review of prReviews) {
-        const reviewComments = await fetchList(`pulls/${issue.number}/reviews/${review.id}/comments`)
+        const reviewComments = await fetchList(`pulls/comments/${review.id}`)
         review.comments = reviewComments
         comments = comments.concat(reviewComments)
       }
@@ -71,9 +77,9 @@ const fetchIssues = async () => {
 }
 
 /**
- * 
- * @param {{}[]} issues 
- * @param {{}[]} pulls 
+ *
+ * @param {{}[]} issues
+ * @param {{}[]} pulls
  */
 const writeIssues = async (issues) => {
   await fs.ensureDir(`${repo}/issues`)

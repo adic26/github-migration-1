@@ -55,6 +55,8 @@ OriginalRepo -> NewRepo2
 NewRepo1 -> offset issues -> NewRepo2
 ```
 
+
+
 To migrate `NewRepo1` to `NewRepo2`, before running `git push` and `createBranches`, first update `config.js` to have an increment, based on the last issue # from `OriginalRepo`:
 
 ```
@@ -64,3 +66,14 @@ increment: 188
 Then, run `npm run increment`. After that, you can run through `git push`, `createBranches`, `createIssues`, and `createComments`.
 
 The pull requests to `NewRepo1` that merged will have mismatched #'s, so you'll need to manually rewrite commit messages to link up the numbers (same as the offset / increment).
+
+## Custom Work:
+you have to manually create the missing issues by changing the source and target , where:
+source is `NewRepo1` and target is `NewRepo2`:
+- run `npm run fetch`
+- go to `<source-repo>.git` and open `packed-refs` and change the numbering of new PRs for both `head` and `merge`
+- run `npm run rewriteRefs`
+- for all NEW PRs run `git push pr<newPR#>head`
+- go to `issues` folder and change the number of each new PR `issues-<newPR#>.json`
+- run `createBranches`
+- run `createIssues`
